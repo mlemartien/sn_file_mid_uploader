@@ -15,6 +15,7 @@ JCL_FileUploader.prototype = {
         this.FilePart = Packages.org.apache.commons.httpclient.methods.multipart.FilePart;
         this.Part = Packages.org.apache.commons.httpclient.methods.multipart.Part;
         this.StringPart = Packages.org.apache.commons.httpclient.methods.multipart.StringPart;
+        this.FileSystem = Packages.java.nio.file.FileSystems;
 
         // Get the parameters from the caller
 
@@ -24,6 +25,10 @@ JCL_FileUploader.prototype = {
         this.fileName = probe.getParameter('fileName');
         this.tableName = probe.getParameter('tableName');
         this.documentId = probe.getParameter('documentId');
+
+	// Get the file path separator the Operating System uses
+
+	this.osFilePathSeparator = this.FileSystem.getDefault().getSeparator();
 
     },
 
@@ -38,9 +43,15 @@ JCL_FileUploader.prototype = {
         // Setting some base data to run this function
 
         var apiEndPoint = 'https://' + this.instance + '/api/now/attachment/upload';
-        var localFileFullName = this.fileLocation + '/' + this.fileName;
+        var localFileFullName = this.fileLocation + this.osFilePathSeparator + this.fileName;
+
+	// Getting connection info from the MID server config file
+	    
         var apiUserName = ms.getConfigParameter('mid.instance.username');
         var apiUserPassword = ms.getConfigParameter('mid.instance.password');
+	var useProxy = ms.getConfigParameter('mid.proxy.use_proxy');
+	var proxyHost = ms.getConfigParameter('mid.proxy.host');
+	var proxyPort = ms.getConfigParameter('mid.proxy.port');	    
 
         // Set up the HTTP Connection
 
