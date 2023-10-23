@@ -29,9 +29,9 @@ JCL_FileUploader.prototype = {
         this.tableName = probe.getParameter('tableName');
         this.documentId = probe.getParameter('documentId');
 
-		// Get the file path separator the Operating System uses
+        // Get the file path separator the Operating System uses
 
-		this.osFilePathSeparator = this.FileSystem.getDefault().getSeparator();
+        this.osFilePathSeparator = this.FileSystem.getDefault().getSeparator();
 
     },
 
@@ -43,22 +43,22 @@ JCL_FileUploader.prototype = {
     
     execute: function() {
 
-		// Status we'll put in the input ecc entry
+        // Status we'll put in the input ecc entry
 
-		var result = 'SUCCESS';
+        var result = 'SUCCESS';
 
         // Setting some base data to run this function
 
         var apiEndPoint = 'https://' + this.instance + '/api/now/attachment/upload';
         var localFileFullName = this.fileLocation + this.osFilePathSeparator + this.fileName;
 
-		// Getting connection info from the MID server config file
+        // Getting connection info from the MID server config file
   
         var apiUserName = ms.getConfigParameter('mid.instance.username');
         var apiUserPassword = ms.getConfigParameter('mid.instance.password');
-		var useProxy = ms.getConfigParameter('mid.proxy.use_proxy');
-		var proxyHost = ms.getConfigParameter('mid.proxy.host');
-		var proxyPort = ms.getConfigParameter('mid.proxy.port');	    
+        var useProxy = ms.getConfigParameter('mid.proxy.use_proxy');
+        var proxyHost = ms.getConfigParameter('mid.proxy.host');
+        var proxyPort = ms.getConfigParameter('mid.proxy.port');        
 
         // Set up the HTTP Connection
 
@@ -71,11 +71,11 @@ JCL_FileUploader.prototype = {
         this.midLog('Using user ' + apiUserName + ' to connect to ' + apiEndPoint);
         client.getState().setCredentials(authScope, credentials);
 
-		// Configure proxy if there is one configured in the MID server
+        // Configure proxy if there is one configured in the MID server
 
-		if (useProxy == 'true') {
-			client.getHostConfiguration().setProxy(proxyHost, proxyPort);
-		}
+        if (useProxy == 'true') {
+            client.getHostConfiguration().setProxy(proxyHost, proxyPort);
+        }
 
         // Create the POST REST request
 
@@ -98,7 +98,7 @@ JCL_FileUploader.prototype = {
         } catch (ex) {
 
             this.midLog('Error | Could not locate file ' + localFileFullName + '(' + ex.message + ')');
-			result = 'FAILURE';
+            result = 'FAILURE';
         }
 
         var entity = new this.MultipartRequestEntity(parts, post.getParams());
@@ -106,33 +106,33 @@ JCL_FileUploader.prototype = {
 
         // Ready to execute the REST call
 
-		this.midLog(JSON.stringify(result));
-		
-		if (result == 'SUCCESS') {
+        this.midLog(JSON.stringify(result));
+        
+        if (result == 'SUCCESS') {
 
-			try {
+            try {
 
-				postStatus = client.executeMethod(post);
+                postStatus = client.executeMethod(post);
 
-				if (postStatus == 201) {
-					this.midLog('Info | Successfully uploaded file ' + localFileFullName);
-				} else {
-					this.midLog('Error | Could not upload file ' + localFileFullName + '. Error http ' + postStatus);
-				result = 'FAILURE';
-				}
+                if (postStatus == 201) {
+                    this.midLog('Info | Successfully uploaded file ' + localFileFullName);
+                } else {
+                    this.midLog('Error | Could not upload file ' + localFileFullName + '. Error http ' + postStatus);
+                result = 'FAILURE';
+                }
 
-			} catch (ex) {
+            } catch (ex) {
 
-				this.midLog('Error | Could not upload file ' + localFileFullName + '. Exception occurred in posting: ' + ex.message);
-				result = 'FAILURE';
+                this.midLog('Error | Could not upload file ' + localFileFullName + '. Exception occurred in posting: ' + ex.message);
+                result = 'FAILURE';
 
-			}
-			
-		}
+            }
+            
+        }
 
-		return result;
+        return result;
 
-	},
+    },
 
     type: 'JCL_FileUploader'
 };
